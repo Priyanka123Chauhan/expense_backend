@@ -1,42 +1,14 @@
+const ensureAuthenticated = require('./auth');
 
-const Joi = require('joi');
-const jwt = require('jsonwebtoken');
+const authorizeRoles = (...allowedRoles) => {
+    return (req, res, next) => {
+        ensureAuthenticated(req, res, () => {
+            if (!allowedRoles.includes(req.user.role)) {
+                return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+            }
+            next();
+        });
+    };
+};
 
-
-const signupValidation = (req,res,next) => {
-    console.log('signupValidation req.body:', req.body);
-    const schema = Joi.object(
-{
-    "name": Joi.string().min(3).max(100).required(),
-    "email":Joi.string().email().required(),
-    "pass": Joi.string().min(3).max(100).required()
-}
-    );
-const{error} = schema.validate(req.body);
-if(error)
-{
-   return res.status(400).json({message :"Bad Request!!",error});
-}
-next();
-}
-
-
-const loginValidation = (req,res,next) => {
-    const schema = Joi.object(
-{
-    "email":Joi.string().email().required(),
-    "pass": Joi.string().min(3).max(100).required()
-}
-    );
-const{error} = schema.validate(req.body);
-if(error)
-{
-   return res.status(400).json({message :"Bad Request!!",error});
-}
-next();
-}
-
-
-
-
-module.exports = {signupValidation,loginValidation};
+module.exports = { authorizeRoles };

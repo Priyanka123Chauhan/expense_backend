@@ -11,6 +11,7 @@ const UserSchema = new mongoose.Schema({
     name: { type: String, required: true }, // ✅ Add this if missing
     email: { type: String, required: true, unique: true },
     pass: { type: String, required: true },
+    role: { type: String, enum: ['employee', 'admin'], default: 'employee' },
     expenses: [ExpenseSchema]
 }, { timestamps: true }); 
 module.exports = mongoose.model('User', UserSchema);

@@ -1,30 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const { addExpenses, fetchExpenses, deleteExpenses } = require('../controllers/expenseController');
-const ensureAuthenticated = require('../middleware/auth'); // optional
+const expenseController = require('../controllers/expenseController');
+const { authorizeRoles } = require('../middleware/authMiddleware');
 
-// ✅ Correct usage: handlers must be functions (no parentheses)
-router.get('/', ensureAuthenticated, fetchExpenses);
-router.post('/', ensureAuthenticated, addExpenses);
-router.delete('/delete', ensureAuthenticated, deleteExpenses);
+// Employee routes
+router.post('/', authorizeRoles('employee'), expenseController.addExpense);
+router.get('/', authorizeRoles('employee'), expenseController.getOwnExpenses);
 
+// Admin routes
+router.get('/all', authorizeRoles('admin'), expenseController.getAllExpenses);
+router.get('/all/category-summary', authorizeRoles('admin'), expenseController.getCategorySummary);
+router.get('/all/monthly-summary', authorizeRoles('admin'), expenseController.getMonthlySummary);
+router.get('/all/overall-summary', authorizeRoles('admin'), expenseController.getOverallSummary);
+router.get('/all/expense-overtime-summary', authorizeRoles('admin'), expenseController.getExpenseOvertimeSummary);
+router.patch('/:id/status', authorizeRoles('admin'), expenseController.updateExpenseStatus);
 
 module.exports = router;
-
-
-// const { addExpenses,fetchExpenses,deleteExpenses } = require('../controllers/expenseController');
-// const { ensureAuthenticated } = require('../middleware/authMiddleware');
-
-
-// const express = require("express");
-// const router = express.Router();
-
-// router.post('/',ensureAuthenticated,addExpenses);
-// router.get('/expenses', ensureAuthenticated,fetchExpenses); 
-// router.get('/',ensureAuthenticated,fetchExpenses);
-
-// router.delete('/:expenseId', deleteExpenses);
-
-// module.exports = router;
-
-
